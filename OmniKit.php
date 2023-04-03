@@ -9,7 +9,10 @@
    */
 
   // Default values
-  define('MY_PLUGIN_VERSION', '1.0.0');
+  define('OmniKitVersion', '1.0.0');
+  define("OmniKitPluginLocation", dirname(__FILE__));
+  define("OmniKitPluginName", "OmniKit");
+  
   $debug = true;
   if(isset($debug) && $debug == true){ error_reporting(E_ALL); ini_set('display_errors', 'On'); } // Debug state
   
@@ -26,4 +29,6 @@
     require_once($filename);
   }
 
+// Navigation 
+include OmniKitFolder().'/includes/navigation.php';
   
