@@ -10,4 +10,4 @@
 //       }, 10, 2);
 //   }
 
-  $updater = new GitHubPluginUpdater(OmniKitPluginName."/OmniKit.php", 'LennardKu', 'OmniKit');
+$updater = new GitHubPluginUpdater(OmniKitPluginName."/OmniKit.php", 'LennardKu', 'OmniKit');
