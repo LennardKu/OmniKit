@@ -28,4 +28,3 @@ function OmniKitCreateDatabases(){
     $dataHandler->createTable($databaseName, $database);
   }
 }
-
