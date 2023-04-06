@@ -11,7 +11,7 @@ function OmniKitNavigation(){
 
         // Style  
         wp_enqueue_style('OmniKitStyle', OmniKitUrl().'/src/css/style.css'  );
-        wp_enqueue_style('OmniKitBootstrap', OmniKitUrl().'/src/css/bootstrap.css'  );
+        wp_enqueue_style('OmniKitFontAwesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css'  );
         wp_enqueue_script('OmniKitScript', OmniKitUrl().'/src/js/main.js'  );
 
         // Submenu 
@@ -25,6 +25,7 @@ function OmniKitNavigation(){
 *   Dashboard
 */
 function OmniKitDashboard(){
+    wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
     echo '<main class="omnikit-wrapper">';
         include OmniKitFolder().'/panels/dashboard/main.panel.php';
     echo '</main>';
@@ -34,6 +35,7 @@ function OmniKitDashboard(){
 *   
 */
 function OmniKitVariables(){
+    wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
     echo '<main class="omnikit-wrapper">';
         include OmniKitFolder().'/panels/variables/dashboard.panel.php';
     echo '</main>';
