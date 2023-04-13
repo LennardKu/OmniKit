@@ -1,55 +1,59 @@
 <?php
-
-class OmniKitLoginLayout {
+class CustomLogin {
+  private $db;
+  private $options;
 
   public function __construct() {
-    add_action( 'login_enqueue_scripts', array( $this, 'customLoginStyles' ) );
-    add_filter( 'login_headerurl', array( $this, 'customLoginLogoUrl' ) );
-    add_filter( 'login_headertext', array( $this, 'customLoginLogoTitle' ) );
-    add_filter( 'login_message', array( $this, 'customLoginMessage' ) );
-    //  ! add_action( 'login_form', array( $this, 'customLoginForm' ) );
+    global $wpdb;
+    $this->db = $wpdb;
+    $this->options = array();
+    $this->loadOptions();
+    $this->init();
   }
 
-  // Add custom styles to the login page
-  public function customLoginStyles() {
-    wp_enqueue_style( 'custom-login-styles', OmniKitUrl() . '/src/css/login.php' );
+  private function loadOptions() {
+    $results = $this->db->get_results("SELECT * FROM wp_custom_login_options");
+    foreach ($results as $result) {
+      $this->options[$result->slug] = $result->value;
+    }
   }
 
-  // Change the login logo URL
-  public function customLoginLogoUrl() {
-    return home_url();
+  private function init() {
+    add_action('login_enqueue_scripts', array($this, 'customLoginStyle'));
+    add_action('login_head', array($this, 'customLoginLogo'));
+    add_action('login_enqueue_scripts', array($this, 'customLoginColors'));
+    add_action('login_enqueue_scripts', array($this, 'customLoginForm'));
   }
 
-  // Change the login logo title
-  public function customLoginLogoTitle() {
-    return get_bloginfo( 'name' );
+  public function customLoginStyle() {
+    wp_enqueue_style( 'custom-login', get_stylesheet_directory_uri() . '/' . $this->options['css_file'] );
   }
 
-  // Customize the login message
-  public function customLoginMessage( $message ) {
-    return '<p class="message">Enter your custom message here.</p>';
+  public function customLoginLogo() {
+    $customLogoUrl = get_stylesheet_directory_uri() . '/' . $this->options['logo_file'];
+    echo '<style>.login h1 a { background-image: url(' . $customLogoUrl . '); }</style>';
   }
 
-  // Customize the login form
+  public function customLoginColors() {
+    $style = '<style>';
+    $style .= 'body.login { background-image: url("' . get_stylesheet_directory_uri() . '/' . $this->options['background_image_file'] . '"); background-size: cover; }';
+    $style .= 'body.login form { background-color: ' . $this->options['form_background_color'] . '; }';
+    $style .= 'body.login input[type="text"], body.login input[type="password"] { background-color: ' . $this->options['input_background_color'] . '; border: none; box-shadow: none; }';
+    $style .= 'body.login input[type="submit"], body.login .button { background-color: ' . $this->options['button_background_color'] . '; border: none; box-shadow: none; text-shadow: none; }';
+    $style .= 'body.login input[type="submit"]:hover, body.login .button:hover { background-color: ' . $this->options['button_hover_color'] . '; }';
+    $style .= '</style>';
+    echo $style;
+  }
+
   public function customLoginForm() {
-    $usernameLabel = __( 'Username or Email Address' );
-    $passwordLabel = __( 'Password' );
-    $submitLabel = __( 'Log In' );
+    add_filter('login_message', array($this, 'removeLoginLinks'));
+  }
 
-    $userLogin = isset( $_POST['log'] ) ? $_POST['log'] : '';
-
-    $loginForm = '<p class="login-username">
-      <label for="user_login">' . $usernameLabel . '</label>
-      <input type="text" name="log" id="user_login" class="input" value="' . esc_attr( $userLogin ) . '" size="20" autocapitalize="off" />
-    </p>
-    <p class="login-password">
-      <label for="user_pass">' . $passwordLabel . '</label>
-      <input type="password" name="pwd" id="user_pass" class="input" value="" size="20" />
-    </p>
-    <p class="login-submit">
-      <input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="' . esc_attr( $submitLabel ) . '" />
-    </p>';
-
-    echo $loginForm;
+  public function removeLoginLinks($message) {
+    $message = str_replace('<a href="https://wordpress.org/">', '<a style="display:none;" href="https://wordpress.org/">', $message);
+    $message = str_replace('<p class="message register">', '<p style="display:none;" class="message register">', $message);
+    return $message;
   }
 }
+
+new CustomLogin();

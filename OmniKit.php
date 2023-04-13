@@ -41,5 +41,5 @@ function OmniKitActivate() {
 register_activation_hook(__FILE__, 'OmniKitActivate');
 
 // Initialize all classes
-new OmniKitLoginLayout;
+new CustomLogin;
 // ! $secure_wordpress = new SecureWordPress(); 

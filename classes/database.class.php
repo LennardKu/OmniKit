@@ -24,7 +24,7 @@ class WordPressDataHandler {
     foreach ($columns as $columnName => $columnType) {
       $sql .= "$columnName $columnType,";
     }
-    $sql .= "created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,";
+    $sql .= "created_at datetime DEFAULT current_timestamp() NOT NULL,";
     $sql .= "PRIMARY KEY  (id)";
     $sql .= ") $charsetCollate;";
 

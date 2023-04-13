@@ -29,18 +29,25 @@ const OmniKit = {
       button.classList.add('function-added');
       const functionName = button.getAttribute('data-function'),
       constructorName = (button.getAttribute('data-constructor') ? `${button.getAttribute('data-function')}.` : 'OmniKit.');
-      button.addEventListener('click', function () {
-        OmniKit.executeFunction(functionName,constructorName);
-        if(button.getAttribute(`data-omnikit-close`)){
-          document.querySelectorAll(`[data-omnikit-modal="${button.getAttribute('data-omnikit-close')}"]`)[0].remove();
-        }
-      });
-
+      const functions = functionName.split(";");
+        button.addEventListener('click', function () {
+          const execute = async _ => {
+            for (let index = 0; index < functions.length; index++) {
+              setTimeout(async () => {
+                await OmniKit.executeFunction(functions[index],constructorName);
+              }, (index * 1000));
+            }
+          };
+          execute();
+          if(button.getAttribute(`data-omnikit-close`)){
+            document.querySelectorAll(`[data-omnikit-modal="${button.getAttribute('data-omnikit-close')}"]`)[0].remove();
+          }
+        });
     });
   },
 
-  executeFunction: function( functionName = '',constructorName = 'OmniKit.') {
-    eval(`${constructorName}${functionName}`);
+  executeFunction: async function( functionName = '',constructorName = 'OmniKit.') {
+    await eval(`${constructorName}${functionName}`);
   },
 
   submitForm: function (uuid,formUid = '') {
@@ -60,6 +67,15 @@ const OmniKit = {
 
         if(data.success){
           OmniKit.toast.create({type: 'success', title: (data.title ?? 'Success'),content: (data.content ?? ''), autoClose: true });
+          if(form.getAttribute('data-success-close')){
+            OmniKit.modal.close(form.getAttribute('data-success-close'));
+          }
+
+          if(form.getAttribute('data-success')){
+            const successFunction = document.createElement('script');
+            successFunction.innerHTML = form.getAttribute('data-success');
+            document.body.append(successFunction);
+          }
           form.reset();
         }
 
@@ -167,7 +183,7 @@ const OmniKit = {
         let uid =  OmniKit.createUuid();
         let formUid = OmniKit.createUuid();
         let modalUuid = OmniKit.createUuid();
-        let body =  `<form data-form="${formUid}" action="${OmniKit.pluginUrl}/ajax/variables/options.php?change=${id}" >
+        let body =  `<form data-form="${formUid}" action="${OmniKit.pluginUrl}/ajax/variables/options.php?change=${id}" data-success-close="${modalUuid}" data-success="OmniKit.variables.fillTable(false,false,true)">
                         <div class="mb-6">
                           <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark-disable:text-white">Naam</label>
                           <input type="text" value="${variable.name}" name="name" id="name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark-disable:bg-gray-700 dark-disable:border-gray-600 dark-disable:placeholder-gray-400 dark-disable:text-white dark-disable:focus:ring-blue-500 dark-disable:focus:border-blue-500 dark-disable:shadow-sm-light" placeholder="Naam" required>
@@ -198,7 +214,8 @@ const OmniKit = {
   
           if(data.success){
             OmniKit.toast.create({type: 'success', title: (data.title ?? 'Success'),content: (data.content ?? ''), autoClose: true });
-            form.reset();
+            OmniKit.variables.fillTable(false,false,true);
+            // form.reset();
           }
         });
         return;
@@ -209,8 +226,8 @@ const OmniKit = {
     create: function () {
       let uid =  OmniKit.createUuid();
       let formUid = OmniKit.createUuid();
-      let body =  `<form data-form="${formUid}" action="${OmniKit.pluginUrl}/ajax/variables/options.php?submit=true" >
-                      <div class="mb-6">
+      let body =  `<form data-form="${formUid}" action="${OmniKit.pluginUrl}/ajax/variables/options.php?submit=true" data-success-close="create-variable-modal" data-success="OmniKit.variables.fillTable(false,false,true)">
+                      <div class="mb-6"> 
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark-disable:text-white">Naam</label>
                         <input type="text" name="name" id="name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark-disable:bg-gray-700 dark-disable:border-gray-600 dark-disable:placeholder-gray-400 dark-disable:text-white dark-disable:focus:ring-blue-500 dark-disable:focus:border-blue-500 dark-disable:shadow-sm-light" placeholder="Naam" required>
                       </div>
@@ -224,11 +241,11 @@ const OmniKit = {
                       </div>
                       
                     </form>`;
-      OmniKit.modal.create({title: 'Variable aanmaken',body: body,primaryBtn: `<button data-btn="${uid}" data-omnikit-btn data-function="submitForm('${uid}', '${formUid}')" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark-disable:bg-blue-600 dark-disable:hover:bg-blue-700 dark-disable:focus:ring-blue-800">Aanmaken</button>    `});
+      OmniKit.modal.create({title: 'Variable aanmaken',body: body,modalUuid: 'create-variable-modal', primaryBtn: `<button data-btn="${uid}" data-omnikit-btn data-function="submitForm('${uid}', '${formUid}')" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark-disable:bg-blue-600 dark-disable:hover:bg-blue-700 dark-disable:focus:ring-blue-800">Aanmaken</button>`});
     },
 
-    fillTable: async function (tableName = '',data = {}) {
-      if(tableName == ''){
+    fillTable: async function (tableName = '',data = {},reload = false) {
+      if(tableName == false){
         tableName = this.tableName;
         data = this.data;
       }
@@ -236,24 +253,35 @@ const OmniKit = {
       const table = document.querySelectorAll(`[data-omnikit-tables=${tableName}]`)[0];
       this.tableName = tableName;
       this.data = data;
-      const offset = (table.getAttribute('data-offset') ?? 0);
+      let offset = (table.getAttribute('data-offset') ?? 0);
+
+      if(reload == true){
+        table.innerHTML = '';
+        offset = 0;
+      }
 
       OmniKit.getData(`${OmniKit.pluginUrl}${data.page}&offset=${offset}&limit=25`)
         .then(data => {
           for (let key in data){
             let variable = data[key];
-            OmniKit.variables.placeItem(tableName, variable, key);
+            OmniKit.variables.placeItem(tableName, variable, key,offset);
           }
           OmniKit.buttons();
           table.setAttribute('data-offset', Number(offset) + 25);
+          table.querySelectorAll('[data-clipboard]').forEach(clipboard => {
+              clipboard.addEventListener('click', function () {
+                let shortcode = clipboard.getAttribute('data-clipboard');
+                navigator.clipboard.writeText(shortcode);
+                OmniKit.toast.create({type: 'success', title: 'Shortcode gekopieerd',content: `<b>${shortcode}</b> gekopieerd`, autoClose: true });
+              });
+          })
         }).catch(error => console.log(error));
     },  
 
-    placeItem: function (tableName, variable, key) {
+    placeItem: function (tableName, variable, key,setOffset = false) {
       const table = document.querySelectorAll(`[data-omnikit-tables=${tableName}]`)[0];
-      const offset = (table.getAttribute('data-offset') ?? 0);
+      const offset = (setOffset === false ? (table.getAttribute('data-offset') ?? 0) : setOffset);
       const item = document.createElement('tr');
-
       item.innerHTML = `<tr class="bg-white border-b dark-disable:bg-gray-900 dark-disable:border-gray-700">
                           <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark-disable:text-white">
                               <strong class="black">${(Number(key) + 1 + Number(offset))}</strong>
@@ -262,7 +290,7 @@ const OmniKit = {
                             ${variable.name}
                           </td>
                           <td class="px-6 py-4">
-                              ${variable.slug}
+                              <p  class="pointer font-medium text-blue-600 hover:underline" data-clipboard='[omnikit-variable slug="${variable.slug}"]'>${variable.slug}</p>
                           </td>
                           <td class="px-6 py-4">
                             ${variable.content}
@@ -338,7 +366,7 @@ const OmniKit = {
     },
 
     close: function (uuid = null) {
-      document.querySelectorAll(`[data-omnikit-modal="${uuid}"]`).remove();
+      document.querySelectorAll(`[data-omnikit-modal="${uuid}"]`)[0].remove();
     },
 
   },
@@ -418,6 +446,3 @@ OmniKit.pluginUrl = document.currentScript.getAttribute('src');
 window.addEventListener('load', function () {
   OmniKit.config();
 });
-
-
-

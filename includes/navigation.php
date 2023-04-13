@@ -16,6 +16,7 @@ function OmniKitNavigation(){
 
         // Submenu 
         add_submenu_page( 'OmniKit', 'Standaard waarden', 'Standaard waarden', 'manage_options', 'OmniKitVariables', 'OmniKitVariables');
+        add_submenu_page( 'OmniKit', 'Foto editor', 'Foto editor', 'manage_options', 'OmniKitImageEditor', 'OmniKitImageEditor');
 
     }
 
@@ -32,12 +33,22 @@ function OmniKitDashboard(){
 }
 
 /*
-*   
+*   Global variables
 */
 function OmniKitVariables(){
     wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
     echo '<main class="omnikit-wrapper">';
         include OmniKitFolder().'/panels/variables/dashboard.panel.php';
+    echo '</main>';
+}
+
+/*
+* Image editor  
+*/
+function OmniKitImageEditor(){
+    wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
+    echo '<main class="omnikit-wrapper">';
+        include OmniKitFolder().'/panels/images/main.panel.php';
     echo '</main>';
 }
 
