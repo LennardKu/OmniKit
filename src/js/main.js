@@ -329,7 +329,7 @@ const OmniKit = {
                                 </div>
                                 <div class="p-6 space-y-6">${data.body ?? ''}</div>
                                 <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark-disable:border-gray-600 justify-between	">
-                                  <button data-close="${uuid}"  type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark-disable:bg-gray-700 dark-disable:text-gray-300 dark-disable:border-gray-500 dark-disable:hover:text-white dark-disable:hover:bg-gray-600 dark-disable:focus:ring-gray-600">Sluiten</button>
+                                  ${!data.noSecondary ? `<button data-close="${uuid}"  type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark-disable:bg-gray-700 dark-disable:text-gray-300 dark-disable:border-gray-500 dark-disable:hover:text-white dark-disable:hover:bg-gray-600 dark-disable:focus:ring-gray-600">Sluiten</button>` : ``}
                                   ${data.primaryBtn ?? ''}
                                 </div>
                             </div>
@@ -357,8 +357,14 @@ const OmniKit = {
 
       document.querySelectorAll('body')[0].append(modal);
       OmniKit.buttons();
+      OmniKit.modal.closeButtons();
+    },
+
+    closeButtons: function () {
       let closeButtons = document.querySelectorAll('[data-close]');
       closeButtons.forEach(element => {
+        if(element.getAttribute('data-close-set')){ return; }
+        element.setAttribute('data-close-set',true);
         element.addEventListener('click', function () {
           document.querySelectorAll(`[data-omnikit-modal="${element.getAttribute('data-close')}"]`)[0].remove();
         });
@@ -369,6 +375,75 @@ const OmniKit = {
       document.querySelectorAll(`[data-omnikit-modal="${uuid}"]`)[0].remove();
     },
 
+  },
+
+  cache: {
+
+    cachePages: function () {
+      let uid =  OmniKit.createUuid();
+
+      let body =  `<h2>Al uw pagina's worden gecached</h2>
+
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table class="w-full text-sm text-left text-gray-500 dark-disable:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark-disable:bg-gray-700 dark-disable:text-gray-400">
+              <tr>
+                  <th scope="col" class="px-6 py-3">
+                      #
+                  </th>
+                  <th scope="col" class="px-6 py-3">
+                      Naam
+                  </th>
+                  <th scope="col" class="px-6 py-3">
+                      Url
+                  </th>
+              </tr>
+          </thead>
+          <tbody data-omnikit-tables="cachedPages"></tbody>
+        </table>
+      </div>
+      `;
+      OmniKit.modal.create({title: `Pagina's cachen`,noSecondary: true,body: body,modalUuid: uid, primaryBtn: `<button data-omnikit-cache="loader" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark-disable:bg-blue-600 dark-disable:hover:bg-blue-700 dark-disable:focus:ring-blue-800"><span><svg aria-hidden="true" role="status" class="inline w-4 h-4 mr-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/><path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor"/></svg>Laden...</span></button>` });
+
+      let offset = 0;
+      const loopCache = (offset) => {
+        OmniKit.getData(`${OmniKit.pluginUrl}/ajax/cache/options.php?cachePages=true&offset=${offset}`)
+        .then(data => {
+           
+          for (let key = 0; key < data.pages.length; key++) {
+            let page = data.pages[key];
+            let table = document.querySelectorAll(`[data-omnikit-tables="cachedPages"]`)[0];
+            let item = document.createElement('tr');
+            item.innerHTML = `<tr class="bg-white border-b dark-disable:bg-gray-900 dark-disable:border-gray-700">
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark-disable:text-white">
+                                    <strong class="black">${(Number(key) + 1 + Number(offset))}</strong>
+                                </th>
+                                <td class="px-6 py-4">
+                                  ${page.name}
+                                </td>
+                               
+                                <td class="px-6 py-4">
+                                  ${page.url}
+                                </td>
+                                
+                            </tr>`;
+            table.append(item);
+          }
+          
+          if(data.last == undefined){
+            offset = 5 + offset;
+            loopCache(offset);
+            return;
+          }
+
+          document.querySelectorAll('[data-omnikit-cache="loader"]')[0].setAttribute('data-close', uid);
+          document.querySelectorAll('[data-omnikit-cache="loader"]')[0].innerHTML = 'Sluiten';
+          OmniKit.modal.closeButtons();
+          OmniKit.toast.create({type: 'success', title: 'Alle pagina`s gecached', content: `Er zijn ${data.pageCount}`, autoClose: true });
+        }).catch(error => console.log(error));
+      };
+      loopCache(offset);
+    },
   },
 
   // Toast

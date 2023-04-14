@@ -7,7 +7,7 @@ function OmniKitNavigation(){
     if ( current_user_can( 'manage_options' ) ) {
 
         // Menu 
-        add_menu_page('OmniKit', 'OmniKit', 'manage_options', 'OmniKit', 'OmniKitDashboard',OmniKitUrl('/src/images/Simplix-favicon.svg',__DIR__));
+        add_menu_page('OmniKit', 'OmniKit', 'manage_options', 'OmniKit', 'OmniKitDashboard',OmniKitUrl('/src/images/OmniKit-favicon.svg',__DIR__));
 
         // Style  
         wp_enqueue_style('OmniKitStyle', OmniKitUrl().'/src/css/style.css'  );
@@ -17,6 +17,7 @@ function OmniKitNavigation(){
         // Submenu 
         add_submenu_page( 'OmniKit', 'Standaard waarden', 'Standaard waarden', 'manage_options', 'OmniKitVariables', 'OmniKitVariables');
         add_submenu_page( 'OmniKit', 'Foto editor', 'Foto editor', 'manage_options', 'OmniKitImageEditor', 'OmniKitImageEditor');
+        add_submenu_page( 'OmniKit', 'Cache', 'Cache', 'manage_options', 'OmniKitCache', 'OmniKitCache');
 
     }
 
@@ -43,12 +44,12 @@ function OmniKitVariables(){
 }
 
 /*
-* Image editor  
+*   OmniKitCache
 */
-function OmniKitImageEditor(){
+function OmniKitCache () {
     wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
     echo '<main class="omnikit-wrapper">';
-        include OmniKitFolder().'/panels/images/main.panel.php';
+        include OmniKitFolder().'/panels/cache/main.panel.php';
     echo '</main>';
 }
 
