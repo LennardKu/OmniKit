@@ -4,8 +4,6 @@ include substr(realpath(__FILE__), 0, strpos(realpath(__FILE__), "/wp-content/")
 // Page access
 OmniKitPageAccess();
 
-
-
 if(isset($_GET['all'])){
   $variables = array();
   global $wpdb;

@@ -2,6 +2,9 @@
 
 .omnikit-wrapper{max-width: 1200px;}
 
+[data-omnikit-modal] h1,[data-omnikit-modal] h2,[data-omnikit-modal] h3,[data-omnikit-modal] h4,
+.omnikit-wrapper h1,.omnikit-wrapper h2,.omnikit-wrapper h3,.omnikit-wrapper h4{margin: 0 !important;}
+
 .omnikit-section {padding: 64px 32px 48px 32px; position:relative; overflow:hidden;}
 .omnikit-section.overflow-visible {overflow:visible}
 .omnikit-row {display:flex; flex-wrap:wrap; margin:0 -32px; position:relative;}

@@ -16,7 +16,6 @@ function OmniKitNavigation(){
 
         // Submenu 
         add_submenu_page( 'OmniKit', 'Standaard waarden', 'Standaard waarden', 'manage_options', 'OmniKitVariables', 'OmniKitVariables');
-        add_submenu_page( 'OmniKit', 'Foto editor', 'Foto editor', 'manage_options', 'OmniKitImageEditor', 'OmniKitImageEditor');
         add_submenu_page( 'OmniKit', 'Cache', 'Cache', 'manage_options', 'OmniKitCache', 'OmniKitCache');
 
     }

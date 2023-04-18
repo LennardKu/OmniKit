@@ -37,6 +37,17 @@ function OmniKitActivate() {
   OmniKitCreateDatabases();
 }
 
+// Start session
+function register_my_session()
+{
+  if( !session_id() )
+  {
+    session_start();
+  }
+}
+
+add_action('init', 'register_my_session');
+
 // Register the activation hook
 register_activation_hook(__FILE__, 'OmniKitActivate');
 

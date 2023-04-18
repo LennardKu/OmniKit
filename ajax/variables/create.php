@@ -35,6 +35,7 @@ if(isset($_GET['change'])){
   $slug = (isset($_POST['slug']) ? strtolower(str_replace(' ','-',(htmlspecialchars($_POST['slug'])))) : '');
   $content = (isset($_POST['content']) ? htmlspecialchars($_POST['content']) : '');
 
+  global $wpdb;
   $dbName = $wpdb->prefix . "globalVariables";
   $variable = $wpdb->get_results("SELECT * FROM $dbName WHERE `slug` = '$slug'");
 
@@ -45,7 +46,9 @@ if(isset($_GET['change'])){
     }
   }
 
-  $wpdb->update($dbName, array('content'=>$content, 'name'=>$name, 'slug'=>$slug), array('id'=>$id));
+  global $wpdb;
+  $wpdb->update($dbName, array('value '=>$content, 'name'=>$name, 'slug'=>$slug), array('id'=>$id));
+  exit( var_dump( $wpdb->last_query ) );
   echo json_encode(array('success'=>true,'title'=>'Variable Gewijzigd','content'=>'De variable is gewijzigd'));
   exit;
 }

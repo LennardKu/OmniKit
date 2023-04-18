@@ -45,7 +45,7 @@ if(isset($_GET['change'])){
     }
   }
 
-  $wpdb->update($dbName, array('content'=>$content, 'name'=>$name, 'slug'=>$slug), array('id'=>$id));
+  $wpdb->update($dbName, array('value'=>$content, 'name'=>$name, 'slug'=>$slug), array('id'=>$id));
   echo json_encode(array('success'=>true,'title'=>'Variable Gewijzigd','content'=>'De variable is gewijzigd'));
   exit;
 }

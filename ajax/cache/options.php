@@ -7,38 +7,64 @@ OmniKitPageAccess();
 if(isset($_GET['cachePages'])){
   $offset = (isset($_GET['offset']) ? $_GET['offset'] : 0);
 
-  if($offset == 0){
+  if($offset == 0 && !isset($_SESSION['postTypeOffset'])){
     $cache = new OmniKitCache();
     $cache->deleteAllCachedPages();
   }
 
-  $args = array(
-    'post_type' => array( 'page', 'post', 'custom_post_type' ),
-    'post_status' => 'publish',
-    'posts_per_page' => 5,
-    'offset' => $offset,
-  );
-
-  $query = new WP_Query( $args );
   $pagesCached = array();
-
-  if ( $query->have_posts() ) {
-    while ( $query->have_posts() ) {
-        $query->the_post();
-        $cache = new OmniKitCache();
-        $cache->cachePage(get_the_permalink(get_the_ID()));
-
-        array_push($pagesCached,array('name'=> get_the_title(get_the_ID()),'url'=>get_the_permalink(get_the_ID())));
-    }
+  $postTypesOrder = get_post_types();
+  
+  if(!isset($_SESSION['postTypeOffset'])){
+    $_SESSION['postTypeOffset'] = 0;
   }
 
-  // Frontpage 
-  // if($offset == 0){
-  //   $cache = new OmniKitCache();
-  //   $cache->cachePage(get_the_permalink( (get_bloginfo('url').'/')));
-  //   array_push($pagesCached,array('name'=> get_the_title( (get_bloginfo('url').'/') ),'url'=>get_the_permalink( (get_bloginfo('url').'/') )));
-  // }
+  $postTypes = array();
+  foreach($postTypesOrder as $postType){
+    array_push($postTypes,$postType);
+  }
 
-  echo json_encode(array('last'=>(count($pagesCached) < $offset ? true : false),'pages'=>$pagesCached));
+  if(isset($postTypes[$_SESSION['postTypeOffset']])){
+
+    $args = array(
+      'post_type' => array($postTypes[$_SESSION['postTypeOffset']]),
+      'post_status' => 'publish',
+      'posts_per_page' => 5,
+      'offset' => $offset,
+    );
+
+    $query = new WP_Query( $args );
+    $pagesCached = array();
+
+    if ( $query->have_posts() ) {
+      while ( $query->have_posts() ) {
+          $query->the_post();
+          $cache = new OmniKitCache();
+          $cache->cachePage(get_the_permalink(get_the_ID()));
+
+          array_push($pagesCached,array('name'=> get_the_title(get_the_ID()),'url'=>get_the_permalink(get_the_ID())));
+      }
+    }
+  }
+  
+  $lastOffset = $newOffset = false;
+  $postTypeOffset = $_SESSION['postTypeOffset'];
+  if((count($pagesCached) < $offset)){
+    $_SESSION['postTypeOffset']++;
+    $newOffset = true;
+    if(count($postTypes) < $postTypeOffset){
+      $lastOffset = true;
+      unset($_SESSION['postTypeOffset']);
+    }
+  }  
+
+  echo json_encode(array('last'=>$lastOffset,'pages'=>$pagesCached,'newOffset'=>$newOffset,'postTypeOffset'=>$postTypeOffset));
+  exit;
+}
+
+if(isset($_GET['delete'])){  
+  $cache = new OmniKitCache();
+  $cache->deleteAllCachedPages();
+  echo json_encode(array('success'=>true,'title'=>'Cache verwijderd'));
   exit;
 }

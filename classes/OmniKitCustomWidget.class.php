@@ -14,7 +14,7 @@ class OmniKitCustomWidget extends WP_Widget {
           return;
       }
       echo $args['before_widget'];
-      echo $args['before_title'] . 'OmniKit Custom Widget' . $args['after_title'];
+      echo $args['title'];
       echo $instance['content'];
       echo $args['after_widget'];
   }
