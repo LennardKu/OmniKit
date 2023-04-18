@@ -8,7 +8,7 @@ add_action( 'login_enqueue_scripts', 'customLoginStyle' );
 
 // Function to replace the WordPress logo with your own logo
 function customLoginLogo() {
-  $customLogoUrl = 'https://wp-test.lennardkuenen.dev/wp-content/uploads/2023/04/favicon-giesen.png';
+  $customLogoUrl = '';
   echo '<style>.login h1 a { background-image: url(' . $customLogoUrl . '); }</style>';
 }
 add_action( 'login_head', 'customLoginLogo' );

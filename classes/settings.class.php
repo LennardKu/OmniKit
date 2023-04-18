@@ -1,10 +1,9 @@
 <?php
 /*
 * OmniKit settings class
-* @param 
 */
 
-class OmniKitSettings {
+class OmniKitData {
   private $wpdb;
   
   public function __construct () {
@@ -28,12 +27,12 @@ class OmniKitSettings {
     
   }
 
-  public function createSetting (string $name = '', string $slug = '',  $value = '') {
-    $dbName = $this->wpdb->prefix . "OmniKitSettings";
+  public function createSetting (string $name = '', string $slug = '',  $value = array()) {
+    $dbName = $this->wpdb->prefix . "OmniKitData";
     $this->wpdb->insert($dbName, array(
       'name' => $name,
       'slug' => $slug,
-      'value' => json_encode($content), 
+      'value' => json_encode($value), 
     ));
   }
 

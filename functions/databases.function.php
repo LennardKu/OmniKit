@@ -12,7 +12,7 @@ function OmniKitCreateDatabases(){
     ),
 
     
-    'OmniKitSettings'=>array(
+    'OmniKitData'=>array(
       'id' => 'bigint(20) unsigned NOT NULL AUTO_INCREMENT',
       'name' => 'varchar(255) NOT NULL',
       'slug' => 'varchar(255) NOT NULL',

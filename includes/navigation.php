@@ -16,6 +16,7 @@ function OmniKitNavigation(){
 
         // Submenu 
         add_submenu_page( 'OmniKit', 'Standaard waarden', 'Standaard waarden', 'manage_options', 'OmniKitVariables', 'OmniKitVariables');
+        add_submenu_page( 'OmniKit', 'Beveiliging', 'Beveiliging', 'manage_options', 'OmniKitSecurity', 'OmniKitSecurity');
         add_submenu_page( 'OmniKit', 'Cache', 'Cache', 'manage_options', 'OmniKitCache', 'OmniKitCache');
 
     }
@@ -39,6 +40,16 @@ function OmniKitVariables(){
     wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
     echo '<main class="omnikit-wrapper">';
         include OmniKitFolder().'/panels/variables/dashboard.panel.php';
+    echo '</main>';
+}
+
+/*
+*   OmniKitSecurity
+*/
+function OmniKitSecurity () {
+    wp_enqueue_script('OmniKitTailwind', OmniKitUrl().'/src/js/tailwind.js'  );
+    echo '<main class="omnikit-wrapper">';
+        include OmniKitFolder().'/panels/security/main.panel.php';
     echo '</main>';
 }
 

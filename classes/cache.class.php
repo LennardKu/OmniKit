@@ -1,10 +1,14 @@
 <?php
 class OmniKitCache {
     private $cacheFolder;
+    private $wpdb;
 
     public function __construct($cacheFolder = '') {
         $this->cacheFolder = $cacheFolder ? $cacheFolder : dirname(__FILE__) . '/cache/';
 
+        global $wpdb;
+        $this->wpdb = $wpdb;
+        
         // Create cache folder if it doesn't exist
         if (!file_exists($this->cacheFolder)) {
             mkdir($this->cacheFolder, 0777, true);
@@ -26,12 +30,15 @@ class OmniKitCache {
         }
 
         // Fetch the page content and cache it
-        if($this->getHttpResponseCode($url) != "200" || $this->getHttpResponseCode($url) != "302"){
+        if($this->getHttpResponseCode($url) != "200" ){
             return false;
         }
-        
+            
         $pageContent = file_get_contents($url);
         file_put_contents($cacheFile, $pageContent);
+
+        $saveData = new OmniKitData;
+        $saveData->createSetting('Gecachde pagina' , 'cachedPage',  array('url'=>$url));
 
         // Add a footer comment to the cached page
         $cachedContent = file_get_contents($cacheFile);
@@ -61,6 +68,11 @@ class OmniKitCache {
     }
 
     public function deleteAllCachedPages() {
+        
+        // Delete all cached pages 
+        $dbName = $this->wpdb->prefix . "OmniKitData";
+        $variable = $this->wpdb->delete( $dbName, array( 'slug' => 'cachedPage' ) );
+
         // Delete all files in the cache folder
         $files = glob($this->cacheFolder . '/*');
         foreach ($files as $file) {

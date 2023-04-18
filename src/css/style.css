@@ -1,7 +1,7 @@
 
 
 .omnikit-wrapper{max-width: 1200px;}
-
+[data-omnikit-modal] table{    overflow-y: auto;max-height: 300px; display: block;}
 [data-omnikit-modal] h1,[data-omnikit-modal] h2,[data-omnikit-modal] h3,[data-omnikit-modal] h4,
 .omnikit-wrapper h1,.omnikit-wrapper h2,.omnikit-wrapper h3,.omnikit-wrapper h4{margin: 0 !important;}
 

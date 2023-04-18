@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: OmniKit
- * Plugin URI: https://github.com/LennardKu/wordpress-multitool
+ * Plugin URI: https://github.com/LennardKu/OmniKit
  * Version: 1.0.0
  * Author: Lennard
- * Author URI: https://github.com/LennardKu/wordpress-multitool
+ * Author URI: https://github.com/LennardKu/OmniKit
  * Description: This plugin makes it easy to manage you're site
  */
 
@@ -38,7 +38,7 @@ function OmniKitActivate() {
 }
 
 // Start session
-function register_my_session()
+function registerMySession()
 {
   if( !session_id() )
   {
@@ -46,7 +46,7 @@ function register_my_session()
   }
 }
 
-add_action('init', 'register_my_session');
+add_action('init', 'registerMySession');
 
 // Register the activation hook
 register_activation_hook(__FILE__, 'OmniKitActivate');

@@ -25,24 +25,25 @@ if(isset($_GET['cachePages'])){
   }
 
   if(isset($postTypes[$_SESSION['postTypeOffset']])){
+    if($postTypes[$_SESSION['postTypeOffset']] !== 'attachment'){
+      $args = array(
+        'post_type' => array($postTypes[$_SESSION['postTypeOffset']]),
+        'post_status' => 'publish',
+        'posts_per_page' => 5,
+        'offset' => $offset,
+      );
 
-    $args = array(
-      'post_type' => array($postTypes[$_SESSION['postTypeOffset']]),
-      'post_status' => 'publish',
-      'posts_per_page' => 5,
-      'offset' => $offset,
-    );
+      $query = new WP_Query( $args );
+      $pagesCached = array();
 
-    $query = new WP_Query( $args );
-    $pagesCached = array();
+      if ( $query->have_posts() ) {
+        while ( $query->have_posts() ) {
+            $query->the_post();
+            $cache = new OmniKitCache();
+            $cache->cachePage(get_the_permalink(get_the_ID()));
 
-    if ( $query->have_posts() ) {
-      while ( $query->have_posts() ) {
-          $query->the_post();
-          $cache = new OmniKitCache();
-          $cache->cachePage(get_the_permalink(get_the_ID()));
-
-          array_push($pagesCached,array('name'=> get_the_title(get_the_ID()),'url'=>get_the_permalink(get_the_ID())));
+            array_push($pagesCached,array('name'=> get_the_title(get_the_ID()),'url'=>get_the_permalink(get_the_ID())));
+        }
       }
     }
   }
